@@ -4,6 +4,9 @@
 # Raw / local datasets
 raw_dataset/
 
+# Cleaned datasets
+cleaned_dataset/
+
 # Python cache
 __pycache__/
 *.py[cod]
