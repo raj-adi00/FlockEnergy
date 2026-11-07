@@ -28,4 +28,5 @@ pip install -r requirements.txt
 
 #### Execution
 1. Place the Raw REFIT CSV file as ``raw_dataset/`` in root directory.
-2. Run the Jupyter Notebook to execute the pipeline sequentially. 
+2. Place the Raw REFIT CSV file as ``cleaned_dataset/`` in root directory.
+3. Run the Jupyter Notebook to execute the pipeline sequentially. 

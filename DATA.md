@@ -19,3 +19,18 @@ The raw REFIT dataset for House 1 contained significant irregularities in sampli
 ### 4. Remaining Concerns and Final Dataset State
 * **Intentional Missing Values:** The cleaned dataset retains a high volume of null values by design. Appliance 9 remains at 23.04% null (211,988 minutes), and the Aggregate meter is at 12.43% null (114,435 minutes). These are not pipeline errors; they represent true, prolonged sensor outages where injecting synthetic data would corrupt downstream machine learning models.
 * **Flagged Minutes:** A total of 215,387 minutes are flagged as having at least one long outage across the household channels. While there were 0 instances of a complete whole-house blackout (where all 10 columns failed simultaneously), partial dropouts were extremely common.
+
+## Task 2
+### 1. Raw-Data Coverage and Quality Findings
+Mechanical and Behavioral Anomalies: Expanding the analysis to multiple households for cycle detection revealed extreme operational outliers. House 5 exhibited washing machine cycles lasting up to ~3,000 minutes (approximately 48 hours) and drawing nearly 30 kWh.
+
+### 2. Cleaning Steps
+Cycle Extraction Filtering: While Task 1 focused on data cleaning, Task 2 filtering utilized an empirical 20-minute minimum duration threshold to classify and remove 1-to-10-minute active spikes as hardware noise rather than true mechanical wash cycles.
+
+### 3. Decisions About Gaps and Outliers
+Appliance-Level Outliers: The massive 48-hour cycle durations in House 5 were retained. While physically impossible for normal intentional laundry usage (representing a stuck relay, continuous pump failure, or unresolved error state), they represent true sensor captures of a failing appliance and are valid data points for hardware monitoring.
+
+Cycle-Detection Hard Breaks: Missing data (NaN) was deliberately treated as a hard break for the state machine. Cycles are strictly prohibited from bridging across missing data intervals to prevent falsely gluing separate laundry loads together over a sensor blackout.
+
+### 4. Remaining Concerns and Final Dataset State
+Appliance Faults vs. Intentional Usage: The extreme cycle outliers in House 5 highlight that smart meter data captures both human routines and failing hardware. Downstream predictive models must account for the fact that high-energy appliance signatures do not always represent intentional human behavior, which introduces variance into behavioral forecasting models.
