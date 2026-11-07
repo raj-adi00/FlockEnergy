@@ -16,8 +16,8 @@ This project is a reproducible data science pipeline built to process, analyze, 
 #### Initialize the Virtual Environment:
 Open your Git Bash terminal in the project root and run:
 ```
-python -m venv venv
-source venv/Scripts/activate
+python -m venv .venv
+source .venv/Scripts/activate
 ```
 
 #### Install Dependencies
