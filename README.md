@@ -30,3 +30,6 @@ pip install -r requirements.txt
 1. Place the Raw REFIT CSV file as ``raw_dataset/`` in root directory.
 2. Place the Raw REFIT CSV file as ``cleaned_dataset/`` in root directory.
 3. Run the Jupyter Notebook to execute the pipeline sequentially. 
+
+## Trade offs
+1. Current model uses rolling average and leading data to predict output. If you want live result, we will need to drop these features. Current system will run with lag of 7 times. It can't work real time.
