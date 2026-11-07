@@ -89,3 +89,31 @@ Instead, these outliers indicate severe appliance malfunctions (such as a contin
 ### 5. 24 hour analysis of aggreggate vs washing maching power consumption
 
 ![House 1 24-Hour Power Trace (2013-10-23)](images/image_house1_24h.png)
+
+# Task 3
+
+## 1. Data Scope and Splitting Strategy
+
+* **Data Included:** The model processes the official cleaned REFIT data at a 1-minute resolution. The evaluation spans multiple households (e.g., House 1, House 2, House 5).
+* **Train/Test Split:** A **chronological 80/20 split** was utilized for each household (the first 80% of the timeline for training, the final 20% for testing).
+* **Avoiding Data Leakage:** Randomly sampling time windows in time-series data causes severe data leakage, as the model could theoretically use a Wednesday afternoon to predict a Wednesday morning. Chronological splitting strictly enforces the temporal arrow of time, forcing the model to predict completely unseen future appliance usage based only on past behavior.
+
+## 2. Model Selection and Baseline Comparison
+
+* **The Baseline:** An "Always-Off" baseline was established, representing a model that permanently predicts 0W.
+* **The Model:** An **Extra Trees Regressor** was selected as the final architecture.
+* **Justification:** While highly complex models (like Neural Networks or K-Nearest Neighbors) were tested, Extra Trees provided the optimal balance of classification accuracy (F1-score), robustness against overlapping appliance noise (due to its randomized node splitting), and computational scalability for local execution across 15+ households.
+
+## 3. Metric Selection and The Sparsity Paradox
+
+* **F1-Score (Primary):** Because the washing machine is inactive for roughly 95% of the dataset, traditional accuracy is highly misleading. The F1-Score evaluates the model's true capability to correctly detect binary ON/OFF states (>=50W threshold) without being overwhelmed by the massive class imbalance.
+* **Mean Absolute Error (Secondary):** MAE measures the raw deviation in Watts. Comparing the model MAE against the baseline MAE physically illustrates the **Sparsity Paradox**. The baseline often achieves a lower MAE (~40W) simply because it correctly guesses 0W for 95% of the time. The Extra Trees model incurs a higher MAE (~49W) because a single false positive (guessing the washing machine is drawing 2000W when it is actually 0W) inflicts a massive mathematical penalty.
+
+## 4. Actual vs. Predicted Evaluation**
+![Actual vs Prediction Washing Maching Power](images/Task3_Actual_vs_Predicted_House5.png)
+
+## 5. Failure Cases
+By visually analyzing the evaluation data in the House 5 plot, the Extra Trees model demonstrates two distinct failure modes:
+
+* **Coincident False Positives:** Around 11:45, the model predicts a usage spike of over 500W, but the actual washing machine is at 0W. This occurs when another heavy appliance (like a kettle or microwave) creates an aggregate power spike that perfectly mimics the signature of the washing machine's heating element, tricking the model into predicting a false cycle.
+* **Peak Under-Prediction:** Around 13:45, the actual washing machine enters an intense phase drawing over 2000W. The model successfully detects that the machine is ON, but severely under-predicts the magnitude, capping out near ~650W. This happens because tree-based ensembles inherently average the predictions of many trees, which can artificially smooth out extreme, rigid mechanical peaks in the testing data.
